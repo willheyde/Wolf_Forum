@@ -1,6 +1,9 @@
 package ncsu.Forum_Backend_User;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.*;
 
 /**
@@ -14,8 +17,9 @@ public class User {
      * Stores the unique ID created above
      */
     private Long id;
+    private boolean isStudent;
     /**
-     * The studnets unityID
+     * The students unityID
      */
     private String unityId;
     private String displayName;
@@ -31,13 +35,14 @@ public class User {
      * @param bio the users bio
      * @param profilePictureUrl the users profile picture
      */
-    public User(Long id, String unityId, String displayName, String email, String bio, String profilePictureUrl) {
+    public User(Long id, String unityId, String displayName, String email, String bio, String profilePictureUrl, boolean isStudent) {
         setId(id);
         setUnityId(unityId);
         setDisplayName(displayName);
         setEmail(email);
         setBio(bio);
         setProfilePictureUrl(profilePictureUrl);
+        setStudent(isStudent);
     }
     /**
      * User constructor without ID
@@ -47,13 +52,22 @@ public class User {
      * @param bio the users bio
      * @param profilePictureUrl the users profile picture
      */
-    public User(String unityId, String displayName, String email, String bio, String profilePictureUrl) {
+    public User(String unityId, String displayName, String email, String bio, String profilePictureUrl, boolean isStudent) {
         setUnityId(unityId);
         setDisplayName(displayName);
         setEmail(email);
         setBio(bio);
         setProfilePictureUrl(profilePictureUrl);
+        setStudent(isStudent);
+
     }
+    @ManyToMany
+    @JoinTable(
+        name = "user_friends", // name of the join table
+        joinColumns = @JoinColumn(name = "user_id"), // owning user
+        inverseJoinColumns = @JoinColumn(name = "friend_id") // the friend
+    )
+    private Set<User> friends = new HashSet<>();
 	public Long getId() {
 		return id;
 	}
@@ -61,7 +75,12 @@ public class User {
 		return profilePictureUrl;
 	}
 	public void setProfilePictureUrl(String profilePictureUrl) {
-		this.profilePictureUrl = profilePictureUrl;
+		if(profilePictureUrl.length() == 0) {
+			this.profilePictureUrl = null;
+		}
+		else{
+			this.profilePictureUrl = profilePictureUrl;
+		}
 	}
 	public void setId(Long id) {
 		this.id = id;
@@ -70,18 +89,30 @@ public class User {
 		return unityId;
 	}
 	public void setUnityId(String unityId) {
+		if(unityId == null || unityId.length() == 0) {
+			throw new IllegalArgumentException("Invalid UnityID");
+		}
 		this.unityId = unityId;
 	}
 	public String getDisplayName() {
 		return displayName;
 	}
 	public void setDisplayName(String displayName) {
+		if(displayName == null || displayName.length() == 0) {
+			throw new IllegalArgumentException("Invalid display name");
+		}
 		this.displayName = displayName;
 	}
 	public String getEmail() {
 		return email;
 	}
 	public void setEmail(String email) {
+		if(email == null || email.length() == 0) {
+			throw new IllegalArgumentException("Invalid email");
+		}
+		if(email.substring(0, unityId.length()).equals(unityId)) {
+			throw new IllegalArgumentException("Email should be School Email");
+		}
 		this.email = email;
 	}
 	public String getBio() {
@@ -89,6 +120,19 @@ public class User {
 	}
 	public void setBio(String bio) {
 		this.bio = bio;
+	}
+	public boolean isStudent() {
+		return isStudent;
+	}
+	public void setStudent(boolean isStudnet) {
+		this.isStudent = isStudnet;
+	}
+	public Set<User> getFriends() {
+	       return friends;
+	}
+
+	public void setFriends(Set<User> friends) {
+		this.friends = friends;
 	}
 
 }
