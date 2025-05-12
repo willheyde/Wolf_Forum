@@ -1,10 +1,12 @@
 package ncsu.Forum_Backend_User;
 
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
+import ncsu.Forum_Backend_Classes.Classes;
 
 /**
  * User class constructs a user
@@ -26,6 +28,7 @@ public class User {
     private String email;
     private String bio;
     private String profilePictureUrl;
+    private ArrayList<Classes> classes = new ArrayList<>();
     /**
      * User constructor with ID
      * @param id unique Id of user
@@ -44,7 +47,7 @@ public class User {
         setProfilePictureUrl(profilePictureUrl);
         setStudent(isStudent);
     }
-    /**
+	/**
      * User constructor without ID
      * @param unityId the user ID of the user
      * @param displayName the display name of the user
@@ -75,7 +78,7 @@ public class User {
 		return profilePictureUrl;
 	}
 	public void setProfilePictureUrl(String profilePictureUrl) {
-		if(profilePictureUrl.length() == 0) {
+		if(profilePictureUrl == null || profilePictureUrl.length() == 0) {
 			this.profilePictureUrl = null;
 		}
 		else{
@@ -110,9 +113,9 @@ public class User {
 		if(email == null || email.length() == 0) {
 			throw new IllegalArgumentException("Invalid email");
 		}
-		if(email.substring(0, unityId.length()).equals(unityId)) {
-			throw new IllegalArgumentException("Email should be School Email");
-		}
+//		if(email.substring(0, unityId.length()).equals(unityId)) {
+//			throw new IllegalArgumentException("Email should be School Email");
+//		}
 		this.email = email;
 	}
 	public String getBio() {
@@ -134,5 +137,23 @@ public class User {
 	public void setFriends(Set<User> friends) {
 		this.friends = friends;
 	}
- 
+    public ArrayList<Classes> getClasses() {
+		return classes;
+	}
+	public void setClasses(ArrayList<Classes> classes) {
+		this.classes = classes;
+	}
+	public void addClasses(Classes classAdd) {
+		if(classAdd == null) {
+			throw new IllegalArgumentException("Can't add null class");
+		}
+		if(classes.contains(classAdd)) {
+			throw new IllegalArgumentException("Can't add duplicate class");
+		}
+		classes.add(classAdd);
+	}
+	public void removeClasses(Classes classRemove) {
+		classes.remove(classRemove);
+	}
+	
 }
