@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import ncsu.Forum_Backend_Classes.Classes;
 import ncsu.Forum_Backend_Major.Major;
+import ncsu.Forum_Backend_User.GroupChat;
 import ncsu.Forum_Backend_User.User;
 
 @Entity
-public class Message {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,37 +19,30 @@ public class Message {
     private LocalDateTime timestamp;
 
     @ManyToOne
-    @JoinColumn(name = "sender_id")
     private User sender;
 
-    @ManyToOne
-    @JoinColumn(name = "major_id", nullable = true)
-    private Major major;
-
-    @ManyToOne
-    @JoinColumn(name = "classgroup_id", nullable = true)
-    private Classes classTitle;
     @PrePersist
-    protected void onCreate() {
+    private void onCreate() {
         if (timestamp == null) {
             timestamp = LocalDateTime.now();
         }
     }
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
+
     public Message() {
-		this(null,null,null,null,null,null);
+		this(null, null, null, null, MessageType.DIRECT);
 	}
     
-	public Message(Long id, String content, LocalDateTime timestamp, User sender, Major major, Classes classGroup) {
-		this.id = id;
-		this.content = content;
-		this.timestamp = timestamp;
-		this.sender = sender;
-		this.major = major;
-		this.classTitle = classGroup;
+	public Message(Long id, String content, LocalDateTime timestamp, User sender, MessageType type) {
+		setId(id);
+		setContent(content);
+		setTimestamp(timestamp);
+		setSender(sender);
+		setType(type);
 	}
-
-	public Message(String content, LocalDateTime timestamp, User sender, Major major, Classes classGroup) {
-		this(null, content, timestamp, sender, major, classGroup);
+	public Message(String content, LocalDateTime timestamp, User sender, MessageType type) {
+		this(null, content, timestamp, sender, type);
 	}
 
 	public Long getId() {
@@ -81,21 +76,29 @@ public class Message {
 	public void setSender(User sender) {
 		this.sender = sender;
 	}
-
-	public Major getMajor() {
-		return major;
+	public MessageType getType() {
+		return type;
 	}
 
-	public void setMajor(Major major) {
-		this.major = major;
+	public void setType(MessageType type) {
+		if(type == null) {
+			throw new IllegalArgumentException("Message dosn't have a place");
+		}
+		this.type = type;
 	}
+	 public enum MessageType {
+	        MAJOR,
+	        CLASS,
+	        GROUP,
+	        DIRECT
+	    }
+	public abstract void setReceiver(User receiver);
 
-	public Classes getClasses() {
-		return classTitle;
-	}
+	public abstract void setGroupName(GroupChat group);
 
-	public void setClassTitle(Classes classGroup) {
-		this.classTitle = classGroup;
-	}
+	public abstract void setClassName(Classes cls);
 
+	public abstract void setMajor(Major major);
+	
 }
+

@@ -64,6 +64,16 @@ public class User {
         setStudent(isStudent);
 
     }
+    public User() {
+    	this.unityId = null;
+    	this.displayName = null;
+    	this.bio = null;
+    	this.email = null;
+    	this.profilePictureUrl = null;
+    	this.isStudent = false;
+    	this.id = null;
+    	
+    }
     @ManyToMany
     @JoinTable(
         name = "user_friends", // name of the join table
@@ -152,8 +162,4 @@ public class User {
 		}
 		classes.add(classAdd);
 	}
-	public void removeClasses(Classes classRemove) {
-		classes.remove(classRemove);
-	}
-	
 }

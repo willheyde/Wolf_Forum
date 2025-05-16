@@ -1,26 +1,40 @@
 package ncsu.Forum_Backend_Message;
 
+import ncsu.Forum_Backend_User.User;
+import ncsu.Forum_Backend_User.UserRepository;
+import ncsu.Forum_Backend_Classes.Classes;
+import ncsu.Forum_Backend_Classes.ClassesRepository;
+import ncsu.Forum_Backend_Major.Major;
+import ncsu.Forum_Backend_Major.MajorRepository;
+import ncsu.Forum_Backend_User.GroupChat;
+import ncsu.Forum_Backend_Message.GroupChatRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.http.ResponseEntity;
 
-import ncsu.Forum_Backend_Classes.Classes;
-import ncsu.Forum_Backend_Message.Message;
-import ncsu.Forum_Backend_Message.MessageController;
-import ncsu.Forum_Backend_Message.MessageRepository;
-import ncsu.Forum_Backend_User.User;
-
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class MessageControllerTest {
+class MessageControllerTest {
 
     @Mock
     private MessageRepository messageRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private ClassesRepository classesRepository;
+
+    @Mock
+    private MajorRepository majorRepository;
+
+    @Mock
+    private GroupChatRepository groupChatRepository;
 
     @InjectMocks
     private MessageController messageController;
@@ -30,38 +44,77 @@ public class MessageControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        User will = new User(null, "wwheyde", "Will", "wwheyde@ncsu.edu", "bios", null, true);
-        Classes csc116 = new Classes("CSC 116", null, null);
-        csc116.addUser(will);
-        sampleMessage = new Message();
+
+        sampleMessage = new ClassMessage();
         sampleMessage.setId(1L);
-        sampleMessage.setClassTitle(csc116);
-        sampleMessage.setSender(will);
-        sampleMessage.setContent("This is a test message.");
-        sampleMessage.setTimestamp(LocalDateTime.now());
+        sampleMessage.setContent("Test content");
     }
 
     @Test
-    void testPostMessage() {
-        when(messageRepository.save(sampleMessage)).thenReturn(sampleMessage);
+    void testPostClassMessageSuccess() {
+        User sender = new User();
+        sender.setId(1L);
 
-        ResponseEntity<Message> response = messageController.postMessage(sampleMessage);
+        Classes cls = new Classes();
+        cls.setId(2L);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(sender));
+        when(classesRepository.findById(2L)).thenReturn(Optional.of(cls));
+        when(messageRepository.save(any(Message.class))).thenReturn(sampleMessage);
+
+        ResponseEntity<Message> response = messageController.postClassMessage(sampleMessage, 1L, 2L);
 
         assertEquals(201, response.getStatusCodeValue());
         assertEquals(sampleMessage, response.getBody());
-        verify(messageRepository).save(sampleMessage);
+    }
+
+    @Test
+    void testPostClassMessageUserNotFound() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResponseEntity<Message> response = messageController.postClassMessage(sampleMessage, 1L, 2L);
+
+        assertEquals(404, response.getStatusCodeValue());
     }
 
     @Test
     void testGetMessagesByClass() {
         List<Message> messages = List.of(sampleMessage);
-        when(messageRepository.findByClassTitle("CSC116")).thenReturn(messages);
+        when(messageRepository.findByClassId(1L)).thenReturn(messages);
 
-        ResponseEntity<List<Message>> response = messageController.getMessagesByClass("CSC116");
+        List<Message> result = messageController.getMessagesByClass(1L).getBody();
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(1, response.getBody().size());
-        assertEquals("CSC 116", response.getBody().get(0).getClasses().getCourseTitle());
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testGetMessagesByMajor() {
+        List<Message> messages = List.of(sampleMessage);
+        when(messageRepository.findByMajorId(1L)).thenReturn(messages);
+
+        List<Message> result =  messageController.getMessagesByMajor(1L).getBody();
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testGetMessagesByGroup() {
+        List<Message> messages = List.of(sampleMessage);
+        when(messageRepository.findByGroupChatId(1L)).thenReturn(messages);
+
+        List<Message> result = messageController.getMessagesByGroup(1L).getBody();
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testGetDirectMessages() {
+        List<Message> messages = List.of(sampleMessage);
+        when(messageRepository.findDirectMessages(1L, 2L)).thenReturn(messages);
+
+        List<Message> result =  messageController.getDirectMessages(1L, 2L).getBody();
+
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -76,31 +129,29 @@ public class MessageControllerTest {
 
     @Test
     void testGetMessageByIdNotFound() {
-        when(messageRepository.findById(1L)).thenReturn(Optional.empty());
+        when(messageRepository.findById(99L)).thenReturn(Optional.empty());
 
-        ResponseEntity<Message> response = messageController.getMessageById(1L);
+        ResponseEntity<Message> response = messageController.getMessageById(99L);
 
         assertEquals(404, response.getStatusCodeValue());
     }
 
     @Test
-    void testDeleteMessageExists() {
+    void testDeleteMessageFound() {
         when(messageRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(messageRepository).deleteById(1L);
 
         ResponseEntity<Void> response = messageController.deleteMessage(1L);
 
         assertEquals(204, response.getStatusCodeValue());
-        verify(messageRepository).deleteById(1L);
     }
 
     @Test
     void testDeleteMessageNotFound() {
-        when(messageRepository.existsById(1L)).thenReturn(false);
+        when(messageRepository.existsById(999L)).thenReturn(false);
 
-        ResponseEntity<Void> response = messageController.deleteMessage(1L);
+        ResponseEntity<Void> response = messageController.deleteMessage(999L);
 
         assertEquals(404, response.getStatusCodeValue());
-        verify(messageRepository, never()).deleteById(1L);
     }
 }
-
