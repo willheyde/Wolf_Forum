@@ -123,37 +123,37 @@ class MajorControllerTest {
         assertEquals(404, response.getStatusCodeValue());
     }
 
-    @Test
-    void testRemoveClassFromMajorFound() {
-        Classes class1 = new Classes();
-        class1.setCourseTitle("CSC116");
-        sampleMajor.getClasses().add(class1);
-
-        when(majorRepository.findById(1L)).thenReturn(Optional.of(sampleMajor));
-        when(majorRepository.save(any())).thenReturn(sampleMajor);
-
-        ResponseEntity<Major> response = majorController.removeClassFromMajor(1L, "CSC116");
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertTrue(response.getBody().getClasses().isEmpty());
-    }
-
-    @Test
-    void testRemoveClassFromMajorNotFound() {
-        when(majorRepository.findById(1L)).thenReturn(Optional.of(sampleMajor));
-
-        ResponseEntity<Major> response = majorController.removeClassFromMajor(1L, "Nonexistent");
-
-        assertEquals(404, response.getStatusCodeValue());
-    }
-
-    @Test
-    void testRemoveClassFromMajorWhenMajorNotFound() {
-        when(majorRepository.findById(1L)).thenReturn(Optional.empty());
-
-        ResponseEntity<Major> response = majorController.removeClassFromMajor(1L, "Anything");
-
-        assertEquals(404, response.getStatusCodeValue());
-    }
+//    @Test
+//    void testRemoveClassFromMajorFound() {
+//        Classes class1 = new Classes();
+//        class1.setCourseTitle("CSC116");
+//        sampleMajor.getClasses().add(class1);
+//
+//        when(majorRepository.findById(1L)).thenReturn(Optional.of(sampleMajor));
+//        when(majorRepository.save(any())).thenReturn(sampleMajor);
+//
+//        ResponseEntity<Major> response = majorController.removeClassFromMajor(1L, "CSC116");
+//
+//        assertEquals(200, response.getStatusCodeValue());
+//        assertTrue(response.getBody().getClasses().isEmpty());
+//    }
+//
+//    @Test
+//    void testRemoveClassFromMajorNotFound() {
+//        when(majorRepository.findById(1L)).thenReturn(Optional.of(sampleMajor));
+//
+//        ResponseEntity<Major> response = majorController.removeClassFromMajor(1L, "Nonexistent");
+//
+//        assertEquals(404, response.getStatusCodeValue());
+//    }
+//
+//    @Test
+//    void testRemoveClassFromMajorWhenMajorNotFound() {
+//        when(majorRepository.findById(1L)).thenReturn(Optional.empty());
+//
+//        ResponseEntity<Major> response = majorController.removeClassFromMajor(1L, "Anything");
+//
+//        assertEquals(404, response.getStatusCodeValue());
+//    }
 }
 

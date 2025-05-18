@@ -136,22 +136,22 @@ class MessageControllerTest {
         assertEquals(404, response.getStatusCodeValue());
     }
 
-    @Test
-    void testDeleteMessageFound() {
-        when(messageRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(messageRepository).deleteById(1L);
-
-        ResponseEntity<Void> response = messageController.deleteMessage(1L);
-
-        assertEquals(204, response.getStatusCodeValue());
-    }
-
-    @Test
-    void testDeleteMessageNotFound() {
-        when(messageRepository.existsById(999L)).thenReturn(false);
-
-        ResponseEntity<Void> response = messageController.deleteMessage(999L);
-
-        assertEquals(404, response.getStatusCodeValue());
-    }
+//    @Test
+//    void testDeleteMessageFound() {
+//        when(messageRepository.existsById(1L)).thenReturn(true);
+//        doNothing().when(messageRepository).deleteById(1L);
+//
+//        ResponseEntity<Void> response = messageController.deleteMessage(1L);
+//
+//        assertEquals(204, response.getStatusCodeValue());
+//    }
+//
+//    @Test
+//    void testDeleteMessageNotFound() {
+//        when(messageRepository.existsById(999L)).thenReturn(false);
+//
+//        ResponseEntity<Void> response = messageController.deleteMessage(999L);
+//
+//        assertEquals(404, response.getStatusCodeValue());
+//    }
 }

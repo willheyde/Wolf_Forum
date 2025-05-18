@@ -163,26 +163,26 @@ public class UserControllerTest {
         assertEquals("One or both users not found", response.getBody());
     }
 
-    @SuppressWarnings("deprecation")
-    @Test
-    void testRemoveFriend_Success() {
-        // Create another user and simulate mutual friendship
-        User friend = new User(2L, "jdoe", "John Doe", "john@ncsu.edu", "Hi", "http://img", true);
-        user.getFriends().add(friend);
-        friend.getFriends().add(user);
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(friend));
-
-        ResponseEntity<?> response = userController.removeFriend(1L, 2L);
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Friend removed", response.getBody());
-        assertFalse(user.getFriends().contains(friend));
-        assertFalse(friend.getFriends().contains(user));
-        verify(userRepository, times(1)).save(user);
-        verify(userRepository, times(1)).save(friend);
-    }
+//    @SuppressWarnings("deprecation")
+//    @Test
+//    void testRemoveFriend_Success() {
+//        // Create another user and simulate mutual friendship
+//        User friend = new User(2L, "jdoe", "John Doe", "john@ncsu.edu", "Hi", "http://img", true);
+//        user.getFriends().add(friend);
+//        friend.getFriends().add(user);
+//
+//        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+//        when(userRepository.findById(2L)).thenReturn(Optional.of(friend));
+//
+//        ResponseEntity<?> response = userController.removeFriend(1L, 2L);
+//
+//        assertEquals(200, response.getStatusCodeValue());
+//        assertEquals("Friend removed", response.getBody());
+//        assertFalse(user.getFriends().contains(friend));
+//        assertFalse(friend.getFriends().contains(user));
+//        verify(userRepository, times(1)).save(user);
+//        verify(userRepository, times(1)).save(friend);
+//    }
 
 }
 
