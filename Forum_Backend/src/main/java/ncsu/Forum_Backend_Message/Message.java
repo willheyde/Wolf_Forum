@@ -1,5 +1,8 @@
 package ncsu.Forum_Backend_Message;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+
+import org.hibernate.annotations.Cascade;
 
 import jakarta.persistence.*;
 import ncsu.Forum_Backend_Classes.Classes;
@@ -14,9 +17,13 @@ public abstract class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(length = 1000)
     private String content;
     private LocalDateTime timestamp;
+    @ElementCollection
+    @CollectionTable(name = "message_attachments", joinColumns = @JoinColumn(name = "message_id"))
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN) // Optional with Hibernate
+    private ArrayList<Attachment> attachments;
 
     @ManyToOne
     private User sender;
@@ -92,13 +99,20 @@ public abstract class Message {
 	        GROUP,
 	        DIRECT
 	    }
+	public void addAttatchment(Attachment application) {
+		attachments.add(application);
+	}
+	public Attachment removeAttatchment(Attachment attatchment) {
+		attachments.remove(attatchment);
+		return attatchment;
+	}
 	public abstract void setReceiver(User receiver);
-
 	public abstract void setGroupName(GroupChat group);
-
 	public abstract void setClassName(Classes cls);
-
 	public abstract void setMajor(Major major);
-	
+	@Embeddable
+	public static class Attachment {
+		String url;
+	}
 }
 
